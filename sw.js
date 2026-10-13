@@ -1,5 +1,5 @@
 // Офлайн-копия прототипа: все файлы кладутся в кеш при первом открытии.
-const CACHE = 'zdes-proto-694fe54313';
+const CACHE = 'zdes-proto-f404d2121c';
 const FILES = [
  "./",
  "icon-180.png",
@@ -8,21 +8,21 @@ const FILES = [
  "icon-maskable-512.png",
  "icon.svg",
  "index.html",
- "js/devicekey.js",
- "js/idb.js",
- "js/qr.js",
- "js/scanner.js",
+ "lib-devicekey.js",
+ "lib-idb.js",
+ "lib-keys.js",
+ "lib-proto.js",
+ "lib-qr.js",
+ "lib-qrcode.js",
+ "lib-qrmatrix.js",
+ "lib-scanner.js",
+ "lib-station-core.js",
+ "lib-zxing-reader.js",
+ "lib-zxing-share.js",
  "manifest.webmanifest",
  "proto.css",
  "proto.js",
- "shared/keys.js",
- "shared/proto.js",
- "shared/qrmatrix.js",
- "shared/station-core.js",
- "vendor/qrcode.mjs",
- "vendor/zxing/es/reader/index.js",
- "vendor/zxing/es/share.js",
- "vendor/zxing/reader/zxing_reader.wasm"
+ "zxing_reader.wasm"
 ];
 
 self.addEventListener('install', (event) => {

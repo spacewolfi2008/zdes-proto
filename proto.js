@@ -1,16 +1,17 @@
 // Прототип самого рискованного звена: взаимное чтение QR между телефоном и ноутбуком.
 // Никаких запросов в сеть: всё считается и хранится на устройстве.
 
-import { drawQr } from './js/qr.js';
-import { Scanner, cameraErrorText, listCameras } from './js/scanner.js';
-import { isIos, isStandalone, loadDeviceKey, requestPersistence } from './js/devicekey.js';
-import { PhoneCore, StationCore } from './shared/station-core.js';
+import { drawQr } from './lib-qr.js';
+import { Scanner, cameraErrorText, listCameras } from './lib-scanner.js';
+import { isIos, isStandalone, loadDeviceKey, requestPersistence } from './lib-devicekey.js';
+import { PhoneCore, StationCore } from './lib-station-core.js';
 import {
   bytesEqual, decodeChallenge, decodeEnroll, encodeEnroll, fromBase64, fromHex, kindOf, toBase64, toHex,
-} from './shared/proto.js';
-import { kidOf } from './shared/keys.js';
+} from './lib-proto.js';
+import { kidOf } from './lib-keys.js';
 
-const VERSION = '1.0';
+const VERSION = '1.1';
+const BUILD = (document.querySelector('meta[name="zdes-build"]') || { content: '' }).content;
 const params = new URLSearchParams(location.search);
 const PREFER = params.get('decoder') === 'wasm' ? 'wasm' : 'auto';
 
@@ -569,7 +570,7 @@ async function resetStation() {
 
 // --- Запуск ------------------------------------------------------------------
 
-$('version').textContent = VERSION + (PREFER === 'wasm' ? ' (принудительно ZXing)' : '');
+$('version').textContent = VERSION + (BUILD && BUILD.indexOf('__') !== 0 ? ', сборка ' + BUILD : '') + (PREFER === 'wasm' ? ' (принудительно ZXing)' : '');
 $('go-phone').addEventListener('click', () => { show('phone'); runPhoneChecks(); });
 $('go-station').addEventListener('click', () => show('station'));
 $('phone-back').addEventListener('click', () => { if (phone.scanner) stopPhone(); show('home'); });
@@ -592,3 +593,6 @@ if (role === 'phone') { show('phone'); runPhoneChecks(); } else if (role === 'st
 registerServiceWorker();
 if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('controllerchange', renderHomeOffline);
 renderHomeOffline();
+
+// Знак для страницы: основной скрипт запустился, кнопки работают.
+window.__zdesProtoReady = true;

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#15213b">
+<meta name="zdes-build" content="f404d2121c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Здесь: проверка">
@@ -126,6 +127,41 @@
 </main>
 
 <div id="toast" class="toast" role="alert" hidden></div>
+<div id="boot-error" class="boot-error" role="alert" data-files='["lib-devicekey.js","lib-idb.js","lib-keys.js","lib-proto.js","lib-qr.js","lib-qrcode.js","lib-qrmatrix.js","lib-scanner.js","lib-station-core.js","lib-zxing-reader.js","lib-zxing-share.js","proto.css","proto.js","zxing_reader.wasm"]' hidden></div>
+<script nomodule>
+  document.getElementById('boot-error').hidden = false;
+  document.getElementById('boot-error').textContent = 'Этот браузер устарел и не запускает страницу. Откройте её в свежем Chrome, Safari или Яндекс Браузере.';
+</script>
+<script>
+  // Если основной скрипт не запустился, страница сама объясняет почему: кнопки не должны молчать.
+  (function () {
+    var box = document.getElementById('boot-error');
+    function show(text) { box.textContent = text; box.hidden = false; }
+    if (location.protocol === 'file:') {
+      show('Страница открыта как файл с диска, поэтому кнопки не работают: браузер не запускает скрипты и камеру для таких страниц. Откройте её по адресу https://… после выкладки. Порядок действий описан в файле ПРОВЕРКА.md.');
+      return;
+    }
+    setTimeout(function () {
+      if (window.__zdesProtoReady) return;
+      var files = [];
+      try { files = JSON.parse(box.getAttribute('data-files')); } catch (e) { files = []; }
+      if (!files.length) { show('Скрипты страницы не загрузились. Обновите страницу.'); return; }
+      var missing = [];
+      var left = files.length;
+      files.forEach(function (name) {
+        fetch(name, { method: 'HEAD', cache: 'no-store' })
+          .then(function (r) { if (!r.ok) missing.push(name); }, function () { missing.push(name); })
+          .then(function () {
+            left -= 1;
+            if (left) return;
+            show(missing.length
+              ? 'Кнопки не работают: на сайте не хватает файлов: ' + missing.join(', ') + '. Загрузите в репозиторий все файлы из папки site и подождите минуту.'
+              : 'Скрипты страницы не запустились. Обновите страницу. Если не поможет, откройте её в свежем Chrome, Safari или Яндекс Браузере.');
+          });
+      });
+    }, 3000);
+  })();
+</script>
 <script type="module" src="proto.js"></script>
 </body>
 </html>

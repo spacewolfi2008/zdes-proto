@@ -201,3 +201,16 @@ h2 { font-size: 24px; line-height: 1.2; margin: 20px 0 12px; }
   .done { animation: pop 160ms ease-out; }
   @keyframes pop { from { transform: scale(0.94); opacity: 0.4; } to { transform: none; opacity: 1; } }
 }
+
+.boot-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--bad);
+  color: #fff;
+  font-weight: 600;
+}
