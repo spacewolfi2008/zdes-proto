@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15213b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Здесь: проверка">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="proto.css">
+<title>Здесь: проверка связи</title>
+</head>
+<body>
+
+<main id="home" class="screen">
+  <h1>Здесь</h1>
+  <p class="lead">Проверка главного звена: телефон и ноутбук читают коды друг друга без интернета.</p>
+  <div class="choice">
+    <button id="go-station" class="btn btn-primary btn-big">Это ноутбук преподавателя</button>
+    <button id="go-phone" class="btn btn-big">Это телефон студента</button>
+  </div>
+  <p id="home-offline" class="note"></p>
+  <p class="note">Версия прототипа <span id="version"></span>. Страница ничего не отправляет в сеть: всё остаётся на этом устройстве.</p>
+</main>
+
+<main id="phone" class="screen" hidden>
+  <header class="bar">
+    <strong>Телефон</strong>
+    <button id="phone-back" class="link">Сменить роль</button>
+  </header>
+
+  <section id="phone-setup">
+    <h2>Проверка телефона</h2>
+    <ul id="checks" class="checks"></ul>
+    <label class="field">
+      <span>Подпись телефона в отчёте</span>
+      <input id="label" type="text" maxlength="24" autocomplete="off" placeholder="Например: iPhone 11, Аня">
+    </label>
+    <button id="phone-start" class="btn btn-primary btn-big">Начать отметку</button>
+    <p class="note">Браузер спросит доступ к камере. Изображение с камеры не сохраняется и никуда не передаётся.</p>
+  </section>
+
+  <section id="phone-scan" hidden>
+    <div id="phone-qr-wrap" class="qr-wrap">
+      <canvas id="phone-qr" class="qr" aria-label="Код для станции"></canvas>
+      <div id="phone-done" class="done" hidden>
+        <div class="done-mark" aria-hidden="true">✓</div>
+        <div class="done-text">Отмечено</div>
+        <div id="phone-done-time" class="done-time"></div>
+      </div>
+    </div>
+    <p id="phone-status" class="status" role="status">Запускаю камеру…</p>
+    <div class="phone-row">
+      <video id="phone-video" class="preview" muted playsinline></video>
+      <div class="phone-side">
+        <div id="phone-count" class="count">Отметок: 0</div>
+        <button id="phone-camera" class="btn">Другая камера</button>
+        <button id="phone-stop" class="btn">Остановить</button>
+      </div>
+    </div>
+    <p id="phone-stats" class="note"></p>
+  </section>
+</main>
+
+<main id="station" class="screen station" hidden>
+  <header class="bar">
+    <strong>Станция преподавателя</strong>
+    <span id="station-info" class="bar-info"></span>
+    <button id="station-back" class="link">Сменить роль</button>
+  </header>
+
+  <section id="station-setup">
+    <h2>Ноутбук читает телефоны</h2>
+    <p class="lead">На экране появится код, а камера ноутбука будет читать ответы телефонов. Студент подносит телефон экраном к камере на расстояние ладони или двух.</p>
+    <button id="station-start" class="btn btn-primary btn-big">Запустить станцию</button>
+  </section>
+
+  <section id="station-run" hidden>
+    <div class="station-grid">
+      <div class="station-scan">
+        <canvas id="station-qr" class="qr" aria-label="Код станции"></canvas>
+        <video id="station-video" class="preview mirrored" muted playsinline></video>
+        <p class="note">Телефон держат экраном к камере: так он видит этот код, а камера видит ответ.</p>
+      </div>
+      <div class="station-main">
+        <div id="banner" class="banner" role="status">Ждём первый телефон</div>
+        <dl class="stats">
+          <div><dt>Телефонов</dt><dd id="st-phones">0</dd></div>
+          <div><dt>Отметок</dt><dd id="st-ok">0</dd></div>
+          <div><dt>Цикл, медиана</dt><dd id="st-age">—</dd></div>
+          <div><dt>Между отметками</dt><dd id="st-gap">—</dd></div>
+          <div><dt>Отказов</dt><dd id="st-bad">0</dd></div>
+        </dl>
+        <div class="controls">
+          <label>Окно кода
+            <select id="window">
+              <option value="12000">12 секунд</option>
+              <option value="90000">90 секунд</option>
+            </select>
+          </label>
+          <label>Камера
+            <select id="camera"></select>
+          </label>
+          <button id="big" class="btn">Код на весь экран</button>
+          <button id="copy" class="btn">Скопировать отчёт</button>
+          <button id="save" class="btn">Скачать отчёт</button>
+          <button id="reset" class="btn">Сбросить</button>
+        </div>
+        <div class="log-wrap">
+          <table class="log">
+            <thead><tr><th>№</th><th>Время</th><th>Телефон</th><th>Итог</th><th>Цикл</th><th>С прошлой</th></tr></thead>
+            <tbody id="log"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="overlay" class="overlay" hidden>
+    <canvas id="overlay-qr" class="qr"></canvas>
+    <p>Наведите основную камеру телефона на этот код. Нажмите в любом месте, чтобы закрыть.</p>
+  </div>
+</main>
+
+<div id="toast" class="toast" role="alert" hidden></div>
+<script type="module" src="proto.js"></script>
+</body>
+</html>
